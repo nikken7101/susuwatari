@@ -245,11 +245,11 @@ function servoLoopWave(driver, channel) {
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
             if (i % 2 == 0) {
-                setTimeout(function(_i, _d) {
+                setTimeout(function (_i, _d) {
                     pwm[_d].setPulseLength(_i, pulseLengthsDown[nextPulse]);
                 }, getPosFromLeft(d, i) * 50, i, d);
-            } else{
-                setTimeout(function(_i, _d) {
+            } else {
+                setTimeout(function (_i, _d) {
                     pwm[_d].setPulseLength(_i, pulseLengthsUp[nextPulse]);
                 }, getPosFromLeft(d, i) * 50, i, d);
             }
@@ -308,8 +308,18 @@ function servoLoopGuuki() {
     nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
 }
 
+// reset
+function servoReset() {
+    for (var d = 0; d < numDrivers; d++) {
+        for (var i = 0; i < numChannels[d]; i++) {
+            pwm[d].setPulseLength(i, deg2pulse(0));
+        }
+    }
+}
+
 // set-up CTRL-C with graceful shutdown
 process.on('SIGINT', function () {
+    servoReset();
     console.log("\nGracefully shutting down from SIGINT (Ctrl-C)");
     if (timer) {
         clearTimeout(timer);
@@ -370,6 +380,7 @@ process.stdin.on('data', function (chunk) {
         if (peaks_ratio < 0.00001) {
             console.log('stop (' + peaks_ratio + ')');
             playing = false;
+            servoReset();
         } else if (peaks_ratio < 0.08) {
             console.log('beat80 (' + peaks_ratio + ')');
             if (bpm != 80) {
