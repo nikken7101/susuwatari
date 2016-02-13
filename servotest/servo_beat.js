@@ -80,6 +80,92 @@ function checkHairColor(d, i) {
     }
 }
 
+
+function checkGuuki(d, i) {
+    if (d == 0) {
+        // 0x40
+        switch (i) {
+            case 0:
+            case 1:
+                return "guu";
+            case 2:
+            case 3:
+                return "guu";
+            case 4:
+            case 5:
+                return "guu";
+            case 6:
+            case 7:
+                return "ki";
+            case 8:
+            case 9:
+                return "ki";
+            case 10:
+            case 11:
+                return "guu";
+            case 12:
+            case 13:
+                return "ki";
+            case 14:
+            case 15:
+                return "guu";
+        }
+    } else if (d == 1) {
+        // 0x41
+        switch (i) {
+            case 0:
+            case 1:
+                return "ki";
+            case 2:
+            case 3:
+                return "guu";
+            case 4:
+            case 5:
+                return "ki";
+            case 6:
+            case 7:
+                return "ki";
+            case 8:
+            case 9:
+                return "guu";
+            case 10:
+            case 11:
+                return "guu";
+            case 12:
+            case 13:
+                return "guu";
+        }
+    } else {
+        // 0x42
+        switch (i) {
+            case 0:
+            case 1:
+                return "ki";
+            case 2:
+            case 3:
+                return "ki";
+            case 4:
+            case 5:
+                return "ki";
+            case 6:
+            case 7:
+                return "guu";
+            case 8:
+            case 9:
+                return "guu";
+            case 10:
+            case 11:
+                return "ki";
+            case 12:
+            case 13:
+                return "guu";
+            case 14:
+            case 15:
+                return "ki";
+        }
+    }
+}
+
 // pulse lengths in microseconds (theoretically, 1.5 ms
 // is the middle of a typical servo's range)
 // position "-90": 500
@@ -109,7 +195,6 @@ var pulseLengthsKiDown = [deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse
 var pulseLengthsKiUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse(0)];
 
 
-
 var numChannels = [16, 14, 16];
 
 // variables used in servoLoop
@@ -120,6 +205,7 @@ var timer;
 // BPM and interval
 var bpm;
 var interval;
+
 function calc_interval() {
     //interval = bpm / 60.0 / 4.0 * 1000;
     interval = (1.0 / bpm) * 60.0 * 1000;
@@ -145,16 +231,27 @@ function servoLoopDouji() {
 }
 
 // wave
-function servoLoopWave() {
+function getPosFromLeft(driver, channel) {
+    var p = [];
+    p[0] = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 1, 1, 2, 2];
+    p[1] = [3, 3, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4];
+    p[2] = [5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 6, 6, 7, 7];
+    return p[driver][channel];
+}
+function servoLoopWave(driver, channel) {
     if (playing == true) {
         timer = setTimeout(servoLoopWave, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
             if (i % 2 == 0) {
-                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
-            } else {
-                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+                setTimeout(function(_i, _d) {
+                    pwm[_d].setPulseLength(_i, pulseLengthsDown[nextPulse]);
+                }, getPosFromLeft(d, i) * 50, i, d);
+            } else{
+                setTimeout(function(_i, _d) {
+                    pwm[_d].setPulseLength(_i, pulseLengthsUp[nextPulse]);
+                }, getPosFromLeft(d, i) * 50, i, d);
             }
         }
     }
@@ -193,10 +290,18 @@ function servoLoopGuuki() {
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
-            if (i % 2 == 0) {
-                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
+            if (checkGuuki(d, i) == "guu") {
+                if (i % 2 == 0) {
+                    pwm[d].setPulseLength(i, pulseLengthsGuuDown[nextPulse]);
+                } else {
+                    pwm[d].setPulseLength(i, pulseLengthsGuuUp[nextPulse]);
+                }
             } else {
-                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+                if (i % 2 == 0) {
+                    pwm[d].setPulseLength(i, pulseLengthsKiDown[nextPulse]);
+                } else {
+                    pwm[d].setPulseLength(i, pulseLengthsKiUp[nextPulse]);
+                }
             }
         }
     }
@@ -273,7 +378,9 @@ process.stdin.on('data', function (chunk) {
                 if (playing == false) {
                     playing = true;
                     //servoLoopDouji();
-                    servoLoopHairColor();
+                    //servoLoopHairColor();
+                    //servoLoopGuuki();
+                    servoLoopWave();
                 }
             }
         } else {
@@ -284,7 +391,9 @@ process.stdin.on('data', function (chunk) {
                 if (playing == false) {
                     playing = true;
                     //servoLoopDouji();
-                    servoLoopHairColor();
+                    //servoLoopHairColor();
+                    //servoLoopGuuki();
+                    servoLoopWave();
                 }
                 //servoLoopDouji();
             }

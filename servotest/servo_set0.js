@@ -7,7 +7,7 @@ var Pca9685Driver = require("pca9685");
 
 var options = {
     i2c: i2cBus.openSync(1),
-    address: 0x40,
+    address: 0x42,
     frequency: 50,
     debug: true
 };
