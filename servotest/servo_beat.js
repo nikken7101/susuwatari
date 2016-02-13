@@ -28,6 +28,7 @@ function deg2pulse(degree) {
 // position "-90": 500
 // position "0"  : 1450
 // position "90" : 2400
+var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
 
 var numChannels = [16, 14, 16];
 
@@ -49,7 +50,7 @@ function servoLoopDouji() {
     timer = setTimeout(servoLoopDouji, interval);
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
-            pwm[d].setPulseLengthDouji(i, pulseLengths[nextPulse]);
+            pwm[d].setPulseLength(i, pulseLengths[nextPulse]);
         }
         nextPulse = (nextPulse + 1) % pulseLengths.length;
     }
@@ -114,7 +115,7 @@ process.stdin.on('data', function(chunk) {
 
         var peaks_ratio = sum / sum_all;
         if (peaks_ratio < 0.00001) {
-            console.log('stop');
+            console.log('stop (' + peaks_ratio + ')');
         } else if (peaks_ratio < 0.033) {
             console.log('beat80 (' + peaks_ratio + ')');
             if (prev_bpm != bpm) {
