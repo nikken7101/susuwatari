@@ -23,6 +23,63 @@ function deg2pulse(degree) {
     return Math.round(1900.0 / 180.0 * degree + 1450);
 }
 
+function checkHairColor(d, i) {
+    if (d == 0 || d == 2) {
+        // 0x40 and 0x42
+        switch (i) {
+            case 0:
+            case 1:
+                return "brown";
+            case 2:
+            case 3:
+                return "gold";
+            case 4:
+            case 5:
+                return "brown";
+            case 6:
+            case 7:
+                return "brown";
+            case 8:
+            case 9:
+                return "brown";
+            case 10:
+            case 11:
+                return "brown";
+            case 12:
+            case 13:
+                return "gold";
+            case 14:
+            case 15:
+                return "brown";
+        }
+    } else {
+        // 0x41
+        switch (i) {
+            case 0:
+            case 1:
+                return "brown";
+            case 2:
+            case 3:
+                return "gold";
+            case 4:
+            case 5:
+                return "brown";
+            case 6:
+            case 7:
+                return "gold";
+            case 8:
+            case 9:
+                return "brown";
+            case 10:
+            case 11:
+                return "gold";
+            case 12:
+            case 13:
+                return "brown";
+        }
+    }
+}
+
 // pulse lengths in microseconds (theoretically, 1.5 ms
 // is the middle of a typical servo's range)
 // position "-90": 500
@@ -30,8 +87,28 @@ function deg2pulse(degree) {
 // position "90" : 2400
 //var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
 //var pulseLengths = [deg2pulse(-20), deg2pulse(0), deg2pulse(-20), deg2pulse(0)];
+
+// for Douji
 var pulseLengthsDown = [deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
 var pulseLengthsUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0)];
+
+// for HairColor
+//var pulseLengthsBrownDown = [deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+//var pulseLengthsBrownUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+//var pulseLengthsGoldDown = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+//[deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];var pulseLengthsGoldUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0)];
+var pulseLengthsBrownDown = [deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengthsBrownUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0)];
+var pulseLengthsGoldDown = [deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengthsGoldUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse(0)];
+
+//for Guuki
+var pulseLengthsGuuDown = [deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengthsGuuUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0)];
+var pulseLengthsKiDown = [deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengthsKiUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(-30), deg2pulse(0)];
+
+
 
 var numChannels = [16, 14, 16];
 
@@ -59,7 +136,7 @@ function servoLoopDouji() {
         for (var i = 0; i < numChannels[d]; i++) {
             if (i % 2 == 0) {
                 pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
-            } else{
+            } else {
                 pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
             }
         }
@@ -76,7 +153,7 @@ function servoLoopWave() {
         for (var i = 0; i < numChannels[d]; i++) {
             if (i % 2 == 0) {
                 pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
-            } else{
+            } else {
                 pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
             }
         }
@@ -91,14 +168,22 @@ function servoLoopHairColor() {
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
-            if (i % 2 == 0) {
-                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
-            } else{
-                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+            if (checkHairColor(d, i) == "brown") {
+                if (i % 2 == 0) {
+                    pwm[d].setPulseLength(i, pulseLengthsBrownDown[nextPulse]);
+                } else {
+                    pwm[d].setPulseLength(i, pulseLengthsBrownUp[nextPulse]);
+                }
+            } else {
+                if (i % 2 == 0) {
+                    pwm[d].setPulseLength(i, pulseLengthsGoldDown[nextPulse]);
+                } else {
+                    pwm[d].setPulseLength(i, pulseLengthsGoldUp[nextPulse]);
+                }
             }
         }
     }
-    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+    nextPulse = (nextPulse + 1) % pulseLengthsBrownDown.length;
 }
 
 // guuki
@@ -110,7 +195,7 @@ function servoLoopGuuki() {
         for (var i = 0; i < numChannels[d]; i++) {
             if (i % 2 == 0) {
                 pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
-            } else{
+            } else {
                 pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
             }
         }
@@ -187,7 +272,8 @@ process.stdin.on('data', function (chunk) {
                 calc_interval();
                 if (playing == false) {
                     playing = true;
-                    servoLoopDouji();
+                    //servoLoopDouji();
+                    servoLoopHairColor();
                 }
             }
         } else {
@@ -197,7 +283,8 @@ process.stdin.on('data', function (chunk) {
                 calc_interval();
                 if (playing == false) {
                     playing = true;
-                    servoLoopDouji();
+                    //servoLoopDouji();
+                    servoLoopHairColor();
                 }
                 //servoLoopDouji();
             }
