@@ -11,7 +11,7 @@ var options = [];
 for (var d = 0; d < numDrivers; d++) {
     options[d] = {
         i2c: i2cBus.openSync(1),
-        address: 0x40 + 1,
+        address: 0x40 + d,
         frequency: 50,
         debug: false
     }
@@ -28,7 +28,10 @@ function deg2pulse(degree) {
 // position "-90": 500
 // position "0"  : 1450
 // position "90" : 2400
-var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
+//var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
+//var pulseLengths = [deg2pulse(-20), deg2pulse(0), deg2pulse(-20), deg2pulse(0)];
+var pulseLengthsDown = [deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengthsUp = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-30), deg2pulse(0), deg2pulse(30), deg2pulse(0)];
 
 var numChannels = [16, 14, 16];
 
@@ -41,20 +44,78 @@ var timer;
 var bpm;
 var interval;
 function calc_interval() {
-    interval = bpm / 60.0 / 4.0 * 1000;
+    //interval = bpm / 60.0 / 4.0 * 1000;
+    interval = (1.0 / bpm) * 60.0 * 1000;
     console.log(interval);
 }
 
 ////////////////////////////////
 // douji
 function servoLoopDouji() {
-    timer = setTimeout(servoLoopDouji, interval);
+    if (playing == true) {
+        timer = setTimeout(servoLoopDouji, interval);
+    }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
-            pwm[d].setPulseLength(i, pulseLengths[nextPulse]);
+            if (i % 2 == 0) {
+                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
+            } else{
+                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+            }
         }
-        nextPulse = (nextPulse + 1) % pulseLengths.length;
     }
+    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+}
+
+// wave
+function servoLoopWave() {
+    if (playing == true) {
+        timer = setTimeout(servoLoopWave, interval);
+    }
+    for (var d = 0; d < numDrivers; d++) {
+        for (var i = 0; i < numChannels[d]; i++) {
+            if (i % 2 == 0) {
+                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
+            } else{
+                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+            }
+        }
+    }
+    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+}
+
+// HairColor
+function servoHairColor() {
+    if (playing == true) {
+        timer = setTimeout(servoLoopColor, interval);
+    }
+    for (var d = 0; d < numDrivers; d++) {
+        for (var i = 0; i < numChannels[d]; i++) {
+            if (i % 2 == 0) {
+                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
+            } else{
+                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+            }
+        }
+    }
+    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+}
+
+// guuki
+function servoHairGuuki() {
+    if (playing == true) {
+        timer = setTimeout(servoLoopGuuki, interval);
+    }
+    for (var d = 0; d < numDrivers; d++) {
+        for (var i = 0; i < numChannels[d]; i++) {
+            if (i % 2 == 0) {
+                pwm[d].setPulseLength(i, pulseLengthsDown[nextPulse]);
+            } else{
+                pwm[d].setPulseLength(i, pulseLengthsUp[nextPulse]);
+            }
+        }
+    }
+    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
 }
 
 // set-up CTRL-C with graceful shutdown
@@ -88,12 +149,13 @@ for (var d = 0; d < numDrivers; d++) {
 var count_arr = [];
 var count_all_arr = [];
 var times = 0;
-var prev_bpm = -1;
+var playing = false;
+
 
 var N_SUM = 20;
 
 process.stdin.resume();
-process.stdin.on('data', function(chunk) {
+process.stdin.on('data', function (chunk) {
     var count = 0;
     var count_all = 0;
 
@@ -117,21 +179,27 @@ process.stdin.on('data', function(chunk) {
         var peaks_ratio = sum / sum_all;
         if (peaks_ratio < 0.00001) {
             console.log('stop (' + peaks_ratio + ')');
+            playing = false;
         } else if (peaks_ratio < 0.08) {
             console.log('beat80 (' + peaks_ratio + ')');
-            if (prev_bpm != bpm) {
+            if (bpm != 80) {
                 bpm = 80;
-                prev_bpm = bpm;
                 calc_interval();
-                servoLoopDouji();
+                if (playing == false) {
+                    playing = true;
+                    servoLoopDouji();
+                }
             }
         } else {
             console.log('beat140 (' + peaks_ratio + ')');
-            if (prev_bpm != bpm) {
+            if (bpm != 140) {
                 bpm = 140;
-                prev_bpm = bpm;
                 calc_interval();
-                servoLoopDouji();
+                if (playing == false) {
+                    playing = true;
+                    servoLoopDouji();
+                }
+                //servoLoopDouji();
             }
         }
     }
