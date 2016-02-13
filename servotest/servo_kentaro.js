@@ -24,7 +24,12 @@ function deg2pulse(degree) {
 // position "0"  : 1450
 // position "90" : 2400
 //var pulseLengths = [500, 1450, 2400];
-var pulseLengths = [deg2pulse(-90), deg2pulse(0), deg2pulse(90), deg2pulse(0)];
+//var pulseLengths = [deg2pulse(-90), deg2pulse(0), deg2pulse(90), deg2pulse(0)];
+//var pulseLengths = [deg2pulse(-30), deg2pulse(-20), deg2pulse(10), deg2pulse(0), deg2pulse(10), deg2pulse(20), deg2pulse(30)];
+var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
+var pulseLengths2 = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
+//var pulseLengths2 = [deg2pulse(-30), deg2pulse(-20), deg2pulse(10), deg2pulse(0), deg2pulse(10), deg2pulse(20), deg2pulse(30)];
+//var pulseLengths2 = [deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0), deg2pulse(0)];
 //var steeringChannel = 0;
 var numChannels = 16;
 
@@ -43,11 +48,16 @@ function servoLoop(loops) {
 }
 function _servoLoop(loop) {
     if (loop < numLoops) {
-        timer = setTimeout(_servoLoop, 500, loop + 1);
+        timer = setTimeout(_servoLoop, 1000, loop + 1);
+//        timer = setTimeout(_servoLoop, 500, loop + 1);
     }
     //pwm.setPulseLength(steeringChannel, pulseLengths[nextPulse]);
     for (var i = 0; i < numChannels; i++) {
+	if (i == 14) { 
         pwm.setPulseLength(i, pulseLengths[nextPulse]);
+	} else {
+        pwm.setPulseLength(i, pulseLengths2[nextPulse]);
+}	
     }
     nextPulse = (nextPulse + 1) % pulseLengths.length;
 }
@@ -83,12 +93,19 @@ function servoLoopWave2(loops) {
 }
 function _servoLoopWave2(loop) {
     if (loop < numLoops) {
-        timer = setTimeout(_servoLoopWave2, 50 * numChannels, loop + 1);
+        timer = setTimeout(_servoLoopWave2, 500, loop + 1);
     }
     for (var i = 0; i < numChannels; i++) {
-        setTimeout(function(j) {
-            pwm.setPulseLength(j, pulseLengths[nextPulse]);
-        }, 50 * i, i);
+	if (i == 14){ 
+        	setTimeout(function(j) {
+	            pwm.setPulseLength(j, pulseLengths[nextPulse]);
+	        }, 50 * i, i);
+	} else if (i == 15){
+        	setTimeout(function(j) {
+	            pwm.setPulseLength(j, pulseLengths2[nextPulse]);
+	        }, 50 * i, i);
+			
+	}
     }
     nextPulse = (nextPulse + 1) % pulseLengths.length;
 }
@@ -111,6 +128,6 @@ pwm = new Pca9685Driver.Pca9685Driver(options, function startLoop(err) {
     }
     console.log("Starting servo loop...");
 
-    //servoLoop(20);
-    servoLoopWave2(20);
+    servoLoop(100);
+    //servoLoopWave2(20);
 });

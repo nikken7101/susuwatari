@@ -24,7 +24,8 @@ function deg2pulse(degree) {
 // position "0"  : 1450
 // position "90" : 2400
 //var pulseLengths = [500, 1450, 2400];
-var pulseLengths = [deg2pulse(-90), deg2pulse(0), deg2pulse(90), deg2pulse(0)];
+//var pulseLengths = [deg2pulse(-90), deg2pulse(0), deg2pulse(90), deg2pulse(0)];
+var pulseLengths = [deg2pulse(-45), deg2pulse(0), deg2pulse(45), deg2pulse(0)];
 //var steeringChannel = 0;
 var numChannels = 16;
 
@@ -83,7 +84,7 @@ function servoLoopWave2(loops) {
 }
 function _servoLoopWave2(loop) {
     if (loop < numLoops) {
-        timer = setTimeout(_servoLoopWave2, 50 * numChannels, loop + 1);
+        timer = setTimeout(_servoLoopWave2, 500, loop + 1);
     }
     for (var i = 0; i < numChannels; i++) {
         setTimeout(function(j) {
@@ -111,6 +112,6 @@ pwm = new Pca9685Driver.Pca9685Driver(options, function startLoop(err) {
     }
     console.log("Starting servo loop...");
 
-    //servoLoop(20);
-    servoLoopWave2(20);
+    servoLoop(20);
+    //servoLoopWave2(20);
 });

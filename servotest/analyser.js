@@ -36,6 +36,7 @@ var analyser = new Analyser({
 // Copies the current frequency data into a Float32Array array passed into it. 
 /*process.stdin.resume();
 process.stdin.on('data', function(chunk) {
+    console.log(chunk);
     var data = analyser.getFloatFrequencyData(chunk);
     console.log(data);
 });*/
@@ -43,24 +44,41 @@ process.stdin.on('data', function(chunk) {
 // Copies the current frequency data into a Uint8Array passed into it. 
 process.stdin.resume();
 process.stdin.on('data', function(chunk) {
+    var len = chunk.length;
+    //console.log(chunk.length);
+
+    /*for (var i = 0; i < 8; i++) {
+        console.log(chunk[len/8 + i]);
+    }*/
+    var count = 0;
+    var count_all = 0;
+    for (var i = 0; i < len; i++) {
+        //console.log(chunk[i]);
+        count_all++;
+        if (255 <= chunk[i]) {
+            count++;
+        }
+    }
+    console.log(count / count_all);
+
+    //console.log(chunk.length);
+    //console.log(chunk);
+    /*var arr = [];
+    for (var i = 0, l = chunk.length; i < l; i++) {
+        arr[i] = chunk[i];
+    }*/
     var data = analyser.getByteFrequencyData(chunk);
-    console.log(data);
+    //console.log(data.length);
+    //console.log(data[0]);
+    //console.log(data[1]);
+
+    // data[1] is arround 0 (254, 255, 0, or 1) then stop
+    /*if (data[1] == 254 || data[1] == 255 || data[1] == 0 || data[1] == 1) {
+        console.log('stop');
+    } else {
+        console.log('play');
+    }*/
 });
-
-// Copies the current waveform, or time-domain data into a Float32Array array passed into it. 
-//analyser.getFloatTimeDomainData(arr);
-
-// Copies the current waveform, or time-domain data into a Uint8Array passed into it. 
-//analyser.getByteTimeDomainData(arr);
-
-
-//Shortcut methods 
-
-//return array with frequency data in decibels of size <= fftSize 
-//analyser.getFrequencyData(size);
-
-//return array with time data of size <= self.bufferSize (way more than fftSize) 
-//analyser.getTimeData(size);
 
 
 //Can be used both as a sink or pass-through 
