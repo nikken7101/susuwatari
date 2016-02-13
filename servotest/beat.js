@@ -10,6 +10,7 @@ process.stdin.resume();
 process.stdin.on('data', function(chunk) {
     var count = 0;
     var count_all = 0;
+    console.log(chunk);
 
     for (var i = 0, l = chunk.length; i < l; i++) {
         count_all++;

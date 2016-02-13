@@ -13,7 +13,7 @@ for (var d = 0; d < numDrivers; d++) {
         i2c: i2cBus.openSync(1),
         address: 0x40 + 1,
         frequency: 50,
-        debug: true
+        debug: false
     }
 }
 
@@ -42,6 +42,7 @@ var bpm;
 var interval;
 function calc_interval() {
     interval = bpm / 60.0 / 4.0 * 1000;
+    console.log(interval);
 }
 
 ////////////////////////////////
@@ -116,7 +117,7 @@ process.stdin.on('data', function(chunk) {
         var peaks_ratio = sum / sum_all;
         if (peaks_ratio < 0.00001) {
             console.log('stop (' + peaks_ratio + ')');
-        } else if (peaks_ratio < 0.033) {
+        } else if (peaks_ratio < 0.08) {
             console.log('beat80 (' + peaks_ratio + ')');
             if (prev_bpm != bpm) {
                 bpm = 80;
