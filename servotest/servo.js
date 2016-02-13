@@ -26,7 +26,7 @@ function deg2pulse(degree) {
 //var pulseLengths = [500, 1450, 2400];
 var pulseLengths = [deg2pulse(-90), deg2pulse(0), deg2pulse(90), deg2pulse(0)];
 //var steeringChannel = 0;
-var numChannels = 10;
+var numChannels = 16;
 
 // variables used in servoLoop
 var pwm;
