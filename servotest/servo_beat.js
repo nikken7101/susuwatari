@@ -85,9 +85,9 @@ function servoLoopWave() {
 }
 
 // HairColor
-function servoHairColor() {
+function servoLoopHairColor() {
     if (playing == true) {
-        timer = setTimeout(servoLoopColor, interval);
+        timer = setTimeout(servoLoopHairColor, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
@@ -102,7 +102,7 @@ function servoHairColor() {
 }
 
 // guuki
-function servoHairGuuki() {
+function servoLoopGuuki() {
     if (playing == true) {
         timer = setTimeout(servoLoopGuuki, interval);
     }
