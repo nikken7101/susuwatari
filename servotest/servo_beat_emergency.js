@@ -240,7 +240,7 @@ function getPosFromLeft(driver, channel) {
 }
 function servoLoopWave(driver, channel) {
     if (playing == true) {
-        timer = setTimeout(servoLoopWave, interval);
+        timer = setTimeout(servoLoopNext, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
@@ -255,7 +255,13 @@ function servoLoopWave(driver, channel) {
             }
         }
     }
-    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+    if ((nextPulse + 1) < pulseLengthsDown.length) {
+        nextPulse = (nextPulse + 1);
+    } else {
+        guuki = true;
+        nextPulse = 0;
+    }
+    // nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
 }
 
 // HairColor
@@ -286,7 +292,7 @@ function servoLoopHairColor() {
 // guuki
 function servoLoopGuuki() {
     if (playing == true) {
-        timer = setTimeout(servoLoopGuuki, interval);
+        timer = setTimeout(servoLoopNext, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
@@ -305,7 +311,23 @@ function servoLoopGuuki() {
             }
         }
     }
-    nextPulse = (nextPulse + 1) % pulseLengthsDown.length;
+    if ((nextPulse + 1) < pulseLengthsGuuDown.length) {
+        nextPulse = (nextPulse + 1);
+    } else {
+        guuki = false;
+        nextPulse = 0;
+    }
+}
+
+var guuki = true;
+
+// next
+function servoLoopNext() {
+    if (guuki) {
+        servoLoopGuuki();
+    } else {
+        servoLoopWave();
+    }
 }
 
 // reset
@@ -368,25 +390,6 @@ process.stdin.on('data', function (chunk) {
     count_arr[times] = count;
     count_all_arr[times] = count_all;
 
-    // stop suguni
-    if (3 < times) {
-        var sum = 0;
-        var sum_all = 0;
-        for (var i = 0; i < 3; i++) {
-            sum += count_arr[times - i];
-            sum_all += count_all_arr[times - i];
-        }
-
-        var peaks_ratio = sum / sum_all;
-        if (peaks_ratio < 0.00001) {
-            console.log('stop imm (' + peaks_ratio + ')');
-            bpm = -1;
-            playing = false;
-            servoReset();
-            return;
-        }
-    }
-
     if (N_SUM < times) {
         var sum = 0;
         var sum_all = 0;
@@ -398,9 +401,18 @@ process.stdin.on('data', function (chunk) {
         var peaks_ratio = sum / sum_all;
         if (peaks_ratio < 0.00001) {
             console.log('stop (' + peaks_ratio + ')');
-            bpm = -1;
-            playing = false;
-            servoReset();
+            bpm = 140;
+            calc_interval();
+            if (playing == false) {
+                playing = true;
+                //servoLoopDouji();
+                servoLoopNext();
+                //servoLoopHairColor();
+                //servoLoopGuuki();
+                //servoLoopWave();
+            }
+            //playing = false;
+            //servoReset();
         } else if (peaks_ratio < 0.08) {
             console.log('beat80 (' + peaks_ratio + ')');
             if (bpm != 80) {
@@ -408,7 +420,8 @@ process.stdin.on('data', function (chunk) {
                 calc_interval();
                 if (playing == false) {
                     playing = true;
-                    servoLoopDouji();
+                    //servoLoopDouji();
+                    servoLoopNext();
                     //servoLoopHairColor();
                     //servoLoopGuuki();
                     //servoLoopWave();
@@ -421,7 +434,8 @@ process.stdin.on('data', function (chunk) {
                 calc_interval();
                 if (playing == false) {
                     playing = true;
-                    servoLoopDouji();
+                    //servoLoopDouji();
+                    servoLoopNext();
                     //servoLoopHairColor();
                     //servoLoopGuuki();
                     //servoLoopWave();
