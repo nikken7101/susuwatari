@@ -240,7 +240,7 @@ function getPosFromLeft(driver, channel) {
 }
 function servoLoopWave(driver, channel) {
     if (playing == true) {
-        timer = setTimeout(servoLoopNext, interval);
+        timer = setTimeout(servoLoopPatterns, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
@@ -292,7 +292,7 @@ function servoLoopHairColor() {
 // guuki
 function servoLoopGuuki() {
     if (playing == true) {
-        timer = setTimeout(servoLoopNext, interval);
+        timer = setTimeout(servoLoopPatterns, interval);
     }
     for (var d = 0; d < numDrivers; d++) {
         for (var i = 0; i < numChannels[d]; i++) {
@@ -322,7 +322,7 @@ function servoLoopGuuki() {
 var guuki = true;
 
 // next
-function servoLoopNext() {
+function servoLoopPatterns() {
     if (guuki) {
         servoLoopGuuki();
     } else {
@@ -429,7 +429,7 @@ process.stdin.on('data', function (chunk) {
                 if (playing == false) {
                     playing = true;
                     //servoLoopDouji();
-                    servoLoopNext();
+                    servoLoopPatterns();
                     //servoLoopHairColor();
                     //servoLoopGuuki();
                     //servoLoopWave();
@@ -443,7 +443,7 @@ process.stdin.on('data', function (chunk) {
                 if (playing == false) {
                     playing = true;
                     //servoLoopDouji();
-                    servoLoopNext();
+                    servoLoopPatterns();
                     //servoLoopHairColor();
                     //servoLoopGuuki();
                     //servoLoopWave();
